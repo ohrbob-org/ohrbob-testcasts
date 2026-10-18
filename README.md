@@ -37,8 +37,10 @@ Or use the helper script, which posts `examples/config.json` and prints the
 resulting feed URLs:
 
 ```bash
-./scripts/load-example.sh              # http://localhost:5004
-BASE_URL=http://192.168.1.10:5004 ./scripts/load-example.sh
+./scripts/load-example.sh                              # http://localhost:5004
+./scripts/load-example.sh http://192.168.1.10:5004     # custom base URL
+./scripts/load-example.sh http://localhost:5004 other.json
+./scripts/load-example.sh --help
 ```
 
 Point your podcast client at `http://localhost:5004/the-test-show.rss`.

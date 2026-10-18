@@ -4,19 +4,42 @@
 # instance via POST /config, then print the feed URLs.
 #
 # Usage:
-#   ./scripts/load-example.sh [config.json]
+#   ./scripts/load-example.sh [base-url] [config-file]
 #
-# Environment:
-#   BASE_URL   Full base URL of the server (default: http://localhost:5004)
-#   PORT       Port to use when BASE_URL is not set (default: 5004)
+# Arguments:
+#   base-url     Server base URL (default: http://localhost:5004)
+#   config-file  JSON config to POST (default: examples/config.json)
+#
+# Examples:
+#   ./scripts/load-example.sh
+#   ./scripts/load-example.sh http://192.168.1.10:5004
+#   ./scripts/load-example.sh http://localhost:5004 examples/config.json
+#   ./scripts/load-example.sh examples/config.json   # base URL defaults
 #
 set -euo pipefail
 
-BASE_URL="${BASE_URL:-http://localhost:${PORT:-5004}}"
-BASE_URL="${BASE_URL%/}"
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_FILE="${1:-$SCRIPT_DIR/../examples/config.json}"
+DEFAULT_BASE_URL="http://localhost:5004"
+DEFAULT_CONFIG="$SCRIPT_DIR/../examples/config.json"
+
+usage() {
+  awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "${BASH_SOURCE[0]}"
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+# Let the config file be passed on its own (it is not a URL).
+if [[ -n "${1:-}" && ! "$1" =~ ^https?:// && ( -f "$1" || "$1" == *.json ) ]]; then
+  CONFIG_FILE="$1"
+  shift
+fi
+
+BASE_URL="${1:-$DEFAULT_BASE_URL}"
+CONFIG_FILE="${CONFIG_FILE:-${2:-$DEFAULT_CONFIG}}"
+BASE_URL="${BASE_URL%/}"
 
 if ! command -v curl >/dev/null 2>&1; then
   echo "error: curl is required but was not found" >&2
