@@ -2,9 +2,25 @@ services:
   testcasts:
     build: .
     image: podcast-testcasts
+    container_name: podcast-testcasts
+    restart: unless-stopped
     ports:
-      - "3000:3000"
+      # Host port is configurable (PORT=8080 docker compose up); container stays on 3000.
+      - "${PORT:-3000}:3000"
     environment:
       PORT: "3000"
-      # Optional: pin the base URL used in feeds (e.g. when behind a proxy).
+      # Optional: pin the base URL used in feed/enclosure links. Defaults to the
+      # request host, which is usually right when you reach the container directly.
+      # Set this when the container sits behind a proxy or a hostname clients
+      # cannot otherwise infer.
       # PUBLIC_BASE_URL: "http://localhost:3000"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:'+process.env.PORT+'/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3

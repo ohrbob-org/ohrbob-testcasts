@@ -22,6 +22,7 @@ Or with Compose:
 
 ```bash
 docker compose up --build
+# host port is configurable: PORT=8080 docker compose up --build
 ```
 
 Then load a configuration:
