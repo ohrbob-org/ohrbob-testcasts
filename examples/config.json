@@ -1,0 +1,36 @@
+[
+  {
+    "slug": "the-test-show",
+    "name": "The Test Show",
+    "coverUrl": "https://picsum.photos/seed/testshow/1400/1400",
+    "description": "A synthetic podcast used to exercise podcast clients.",
+    "episodes": [
+      {
+        "title": "Episode 1: Hello World",
+        "description": "The very first synthetic episode.",
+        "coverUrl": "https://picsum.photos/seed/ep1/1400/1400",
+        "mp3Slug": "the-test-show-ep1.mp3"
+      },
+      {
+        "title": "Episode 2: Second Serving",
+        "description": "Another two minutes of pure silence.",
+        "coverUrl": "",
+        "mp3Slug": "the-test-show-ep2.mp3"
+      }
+    ]
+  },
+  {
+    "slug": "silence-weekly",
+    "name": "Silence Weekly",
+    "coverUrl": "https://picsum.photos/seed/silence/1400/1400",
+    "description": "Two podcasts are better than one when testing.",
+    "episodes": [
+      {
+        "title": "The Quiet One",
+        "description": "Shhh.",
+        "coverUrl": "",
+        "mp3Slug": "silence-weekly-001.mp3"
+      }
+    ]
+  }
+]

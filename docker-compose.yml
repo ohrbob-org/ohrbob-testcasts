@@ -1,0 +1,10 @@
+services:
+  testcasts:
+    build: .
+    image: podcast-testcasts
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+      # Optional: pin the base URL used in feeds (e.g. when behind a proxy).
+      # PUBLIC_BASE_URL: "http://localhost:3000"
