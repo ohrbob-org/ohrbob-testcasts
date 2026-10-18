@@ -5,6 +5,7 @@ dist
 *.md
 examples
 test
+scripts
 .env
 Dockerfile
 docker-compose.yml

@@ -33,6 +33,14 @@ curl -X POST http://localhost:5004/config \
   --data @examples/config.json
 ```
 
+Or use the helper script, which posts `examples/config.json` and prints the
+resulting feed URLs:
+
+```bash
+./scripts/load-example.sh              # http://localhost:5004
+BASE_URL=http://192.168.1.10:5004 ./scripts/load-example.sh
+```
+
 Point your podcast client at `http://localhost:5004/the-test-show.rss`.
 
 ### Local (no Docker)
