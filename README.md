@@ -145,17 +145,27 @@ the client can't otherwise infer (e.g. `PUBLIC_BASE_URL=http://192.168.1.10:5004
 Build and push to Docker Hub as `kaiwegner/ohrbob.testcasts`:
 
 ```bash
-docker login                      # once, if not already authenticated
 ./scripts/publish.sh              # tags :latest
 ./scripts/publish.sh 1.2.0        # tags :1.2.0
 IMAGE=myuser/my-image ./scripts/publish.sh 1.2.0
 ```
 
-Multi-arch (uses `buildx` and pushes directly):
+Authenticate with a Docker Hub personal access token instead of an interactive
+`docker login`. Pass the username and token as flags, or via `DOCKERHUB_USER` and
+`DOCKERHUB_PAT`; flags win over the environment:
 
 ```bash
-PLATFORMS=linux/amd64,linux/arm64 ./scripts/publish.sh 1.2.0
+DOCKERHUB_USER=kaiwegner DOCKERHUB_PAT=... ./scripts/publish.sh 1.2.0
+./scripts/publish.sh --user kaiwegner --token ... 1.2.0
 ```
+
+The image is built first; the login happens after the build, right before the
+push. The login runs against a throwaway docker config dir, so your own
+`~/.docker/config.json` is left untouched. Supply neither and the script assumes
+you already ran `docker login`.
+
+The image is built for the host architecture (`linux/amd64` on an x86-64
+machine); a single-arch image is all that's needed.
 
 ## Development
 
