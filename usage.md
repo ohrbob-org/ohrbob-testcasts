@@ -2,6 +2,35 @@
 
 Instructions for AI agents and scripts. Read this before invoking the loader.
 
+## What the server is for
+
+`podcast-testcasts` is a throwaway, no-auth fake podcast host. You describe
+podcasts in JSON and it serves real RSS feeds and real (silent) audio, so you
+can exercise a podcast client end to end without depending on any real
+publisher, network, or media files.
+
+Typical uses:
+
+- **Client development** — point an in-progress podcast app at a feed and test
+  parsing, subscribing, episode lists, cover art, and playback.
+- **Feed/metadata testing** — verify RSS 2.0 and iTunes namespace handling:
+  titles, descriptions, artwork, `enclosure` URLs and lengths, `guid`,
+  `pubDate`, `itunes:duration`, and episode ordering.
+- **Download and streaming behaviour** — every episode is a real 2 minute
+  MP3 (~1.9 MB) served with `Content-Length`, `Accept-Ranges`, and `Range`/`HEAD`
+  support, so you can test full downloads, resume, seeking, and partial requests.
+- **Multi-feed and edge cases** — serve several podcasts at once, empty feeds,
+  missing artwork, duplicate/invalid configs, and 404s, to see how a client
+  reacts.
+- **Demos and fixtures** — a stable, self-contained backend for screenshots,
+  integration tests, or CI where a real feed would be flaky or unavailable.
+- **Load and timing checks** — repeated downloads of predictable-size audio
+  without hammering a third party.
+
+It is **not** for production, real audio content, access control, or
+persistence: configuration lives in memory and is replaced on every
+`POST /config`.
+
 ## What it does
 
 `scripts/load-example.sh` POSTs a podcast configuration to a running
