@@ -140,6 +140,23 @@ the client can't otherwise infer (e.g. `PUBLIC_BASE_URL=http://192.168.1.10:5004
 - The silent MP3 is generated in-process (no ffmpeg/lame needed) and cached.
 - Every episode is the same silent audio; only the feed metadata differs.
 
+## Publishing
+
+Build and push to Docker Hub as `kaiwegner/ohrbob.testcasts`:
+
+```bash
+docker login                      # once, if not already authenticated
+./scripts/publish.sh              # tags :latest
+./scripts/publish.sh 1.2.0        # tags :1.2.0
+IMAGE=myuser/my-image ./scripts/publish.sh 1.2.0
+```
+
+Multi-arch (uses `buildx` and pushes directly):
+
+```bash
+PLATFORMS=linux/amd64,linux/arm64 ./scripts/publish.sh 1.2.0
+```
+
 ## Development
 
 ```bash
