@@ -5,15 +5,15 @@ services:
     container_name: podcast-testcasts
     restart: unless-stopped
     ports:
-      # Host port is configurable (PORT=8080 docker compose up); container stays on 3000.
-      - "${PORT:-3000}:3000"
+      # Host port is configurable (PORT=8080 docker compose up); container stays on 5004.
+      - "${PORT:-5004}:5004"
     environment:
-      PORT: "3000"
+      PORT: "5004"
       # Optional: pin the base URL used in feed/enclosure links. Defaults to the
       # request host, which is usually right when you reach the container directly.
       # Set this when the container sits behind a proxy or a hostname clients
       # cannot otherwise infer.
-      # PUBLIC_BASE_URL: "http://localhost:3000"
+      # PUBLIC_BASE_URL: "http://localhost:5004"
     healthcheck:
       test:
         - CMD

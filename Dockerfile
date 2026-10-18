@@ -13,13 +13,13 @@ RUN npm run build && npm prune --omit=dev
 FROM node:24-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=5004
 
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY package.json ./
 
-EXPOSE 3000
+EXPOSE 5004
 USER node
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \

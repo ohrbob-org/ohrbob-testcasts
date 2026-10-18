@@ -15,7 +15,7 @@ No authentication. No database. Config lives in memory and is replaced on every
 
 ```bash
 docker build -t podcast-testcasts .
-docker run --rm -p 3000:3000 podcast-testcasts
+docker run --rm -p 5004:5004 podcast-testcasts
 ```
 
 Or with Compose:
@@ -28,12 +28,12 @@ docker compose up --build
 Then load a configuration:
 
 ```bash
-curl -X POST http://localhost:3000/config \
+curl -X POST http://localhost:5004/config \
   -H 'content-type: application/json' \
   --data @examples/config.json
 ```
 
-Point your podcast client at `http://localhost:3000/the-test-show.rss`.
+Point your podcast client at `http://localhost:5004/the-test-show.rss`.
 
 ### Local (no Docker)
 
@@ -113,12 +113,12 @@ A successful post returns:
 
 | Env var           | Default   | Description                                                        |
 | ----------------- | --------- | ------------------------------------------------------------------ |
-| `PORT`            | `3000`    | Listen port.                                                       |
+| `PORT`            | `5004`    | Listen port.                                                       |
 | `HOST`            | `0.0.0.0` | Listen address.                                                    |
 | `PUBLIC_BASE_URL` | *(auto)*  | Base URL for feed/enclosure links. Defaults to the request host.   |
 
 Set `PUBLIC_BASE_URL` when the server is reached through a proxy or a hostname
-the client can't otherwise infer (e.g. `PUBLIC_BASE_URL=http://192.168.1.10:3000`).
+the client can't otherwise infer (e.g. `PUBLIC_BASE_URL=http://192.168.1.10:5004`).
 
 ## Notes
 

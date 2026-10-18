@@ -1,7 +1,7 @@
 import { createApp } from './app.js';
 import { Store } from './store.js';
 
-const port = Number.parseInt(process.env.PORT ?? '3000', 10);
+const port = Number.parseInt(process.env.PORT ?? '5004', 10);
 const host = process.env.HOST ?? '0.0.0.0';
 
 const store = new Store();
