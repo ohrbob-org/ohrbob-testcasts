@@ -43,6 +43,9 @@ resulting feed URLs:
 ./scripts/load-example.sh --help
 ```
 
+See [`usage.md`](usage.md) for a detailed reference (arguments, exit codes,
+troubleshooting) aimed at automated callers.
+
 Point your podcast client at `http://localhost:5004/the-test-show.rss`.
 
 ### Local (no Docker)
