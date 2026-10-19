@@ -4,7 +4,8 @@ A tiny, disposable podcast server for testing podcast clients. You POST a JSON
 configuration describing your podcasts, and it immediately serves:
 
 - a synthesized **RSS feed** per podcast, with the iTunes podcast extensions,
-- a **2 minute silent MP3** (128 kbit/s, 44.1 kHz, stereo) for every episode.
+- a **silent MP3** (128 kbit/s, 44.1 kHz, stereo) for every episode — 2 minutes
+  by default, or whatever length you configure per episode.
 
 No authentication. No database. Config lives in memory and is replaced on every
 `POST /config`.
@@ -62,7 +63,7 @@ npm test
 | ------ | ------------------------ | -------------------------------------------------------- |
 | `POST` | `/config`                | Replace the configuration with the posted JSON.          |
 | `GET`  | `/{podcast-slug}.rss`    | Synthesized RSS 2.0 feed for that podcast.               |
-| `GET`  | `/{episode-mp3-slug}`    | The 2 minute silent MP3. Supports `Range`/`HEAD`.        |
+| `GET`  | `/{episode-mp3-slug}`    | The silent MP3 for that episode. Supports `Range`/`HEAD`. |
 | `GET`  | `/health`                | `{ status, podcasts, episodes }`.                        |
 | `GET`  | `/`                      | Plain-text usage summary.                                |
 
@@ -83,6 +84,7 @@ Every `POST` **replaces** the previous configuration.
         "title": "Episode 1",
         "description": "The first one.",
         "coverUrl": "https://example.com/ep1.jpg",
+        "durationSeconds": 30,
         "mp3Slug": "the-test-show-ep1.mp3"
       }
     ]
@@ -101,12 +103,14 @@ Fields:
 | `episodes`     | no       | Array; defaults to empty.                                    |
 | `title`        | yes*     | *Episode field. Episode title.                               |
 | `mp3Slug`      | yes*     | *Episode field. Must be unique **across all podcasts**.      |
+| `durationSeconds` | no*   | *Episode field. Length of the silent MP3 in seconds; positive, at most `3600`. Defaults to `120`. |
 | `description`  | no*      | *Episode show notes.                                         |
 | `coverUrl`     | no*      | *Episode artwork; falls back to the podcast cover.           |
 
 For convenience, snake_case and a few common synonyms are accepted
-(`cover_url`, `mp3_slug`, `audioSlug`, `summary`, `image`, ...). Invalid input
-returns `400` with a `details` array listing every problem found.
+(`cover_url`, `mp3_slug`, `audioSlug`, `duration_seconds`, `length`, `summary`,
+`image`, ...). Invalid input returns `400` with a `details` array listing every
+problem found.
 
 A successful post returns:
 
@@ -120,7 +124,8 @@ A successful post returns:
   self-contained; cover images are linked exactly as configured.
 - The newest episode is dated at config time; each following episode steps back
   one day.
-- Enclosure `length` matches the served MP3 byte length.
+- Each episode's enclosure `length` matches its served MP3 byte length, and
+  `itunes:duration` reports its configured length in seconds.
 
 ## Configuration
 
@@ -137,8 +142,10 @@ the client can't otherwise infer (e.g. `PUBLIC_BASE_URL=http://192.168.1.10:5004
 
 - Configuration is **in-memory only**: restarting the container clears it. Re-post
   your config after a restart.
-- The silent MP3 is generated in-process (no ffmpeg/lame needed) and cached.
-- Every episode is the same silent audio; only the feed metadata differs.
+- The silent MP3 is generated in-process (no ffmpeg/lame needed) and cached per
+  length.
+- Every episode is silent; episodes may differ in length and feed metadata. Set a
+  short `durationSeconds` on an episode to skip through a playlist quickly.
 
 ## Publishing
 

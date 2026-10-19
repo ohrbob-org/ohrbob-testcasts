@@ -1,3 +1,4 @@
+import { MAX_DURATION_SECONDS, SILENCE_DURATION_SECONDS } from './silence.js';
 import type { Episode, Podcast } from './types.js';
 
 export interface NormalizeResult {
@@ -33,12 +34,25 @@ function pick(source: Dict, keys: string[]): unknown {
   return undefined;
 }
 
+/** Parse a number of seconds from a number or a numeric string. */
+function asDuration(value: unknown): number | undefined {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value.trim());
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return undefined;
+}
+
 const SLUG_KEYS = ['slug', 'id', 'key'];
 const NAME_KEYS = ['name', 'title'];
 const DESCRIPTION_KEYS = ['description', 'desc', 'summary', 'subtitle'];
 const COVER_KEYS = ['coverUrl', 'cover_url', 'cover', 'imageUrl', 'image_url', 'image', 'artworkUrl', 'artwork_url', 'artwork'];
 const EPISODE_SLUG_KEYS = ['mp3Slug', 'mp3_slug', 'audioSlug', 'audio_slug', 'episodeMp3Slug', 'episode_mp3_slug', 'mp3', 'audio', 'file'];
 const EPISODE_KEYS = ['episodes', 'items', 'episode'];
+const DURATION_KEYS = ['durationSeconds', 'duration_seconds', 'lengthSeconds', 'length_seconds', 'duration', 'length'];
 
 function normalizeEpisode(value: unknown, path: string, errors: string[]): Episode | undefined {
   if (!isDict(value)) {
@@ -56,13 +70,27 @@ function normalizeEpisode(value: unknown, path: string, errors: string[]): Episo
     errors.push(`${path}.mp3Slug is required and must be a non-empty string`);
   }
 
-  if (!title || !mp3Slug) {
+  let durationSeconds = SILENCE_DURATION_SECONDS;
+  let durationValid = true;
+  const rawDuration = pick(value, DURATION_KEYS);
+  if (rawDuration !== undefined) {
+    const parsed = asDuration(rawDuration);
+    if (parsed === undefined || parsed <= 0 || parsed > MAX_DURATION_SECONDS) {
+      errors.push(`${path}.durationSeconds must be a positive number of seconds no greater than ${MAX_DURATION_SECONDS}`);
+      durationValid = false;
+    } else {
+      durationSeconds = parsed;
+    }
+  }
+
+  if (!title || !mp3Slug || !durationValid) {
     return undefined;
   }
 
   return {
     title,
     mp3Slug,
+    durationSeconds,
     description: asString(pick(value, DESCRIPTION_KEYS)) ?? '',
     coverUrl: asString(pick(value, COVER_KEYS)) ?? '',
   };

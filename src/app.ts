@@ -1,7 +1,7 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
 
 import { buildRss } from './rss.js';
-import { SILENCE_DURATION_SECONDS, silenceMp3 } from './silence.js';
+import { silenceMp3 } from './silence.js';
 import { Store } from './store.js';
 import { normalizeConfig } from './validate.js';
 
@@ -58,8 +58,6 @@ export function createApp(store: Store, options: AppOptions = {}): express.Expre
   app.set('x-powered-by', false);
   app.use(express.json({ limit: '10mb' }));
 
-  const audio = silenceMp3();
-
   function resolveBaseUrl(req: Request): string {
     const configured = options.baseUrl ?? process.env.PUBLIC_BASE_URL;
     if (configured) {
@@ -97,8 +95,6 @@ export function createApp(store: Store, options: AppOptions = {}): express.Expre
 
     const xml = buildRss(podcast, {
       baseUrl: resolveBaseUrl(req),
-      episodeLength: audio.length,
-      episodeDurationSeconds: SILENCE_DURATION_SECONDS,
       pubDateBase: store.updatedAt(),
     });
 
@@ -108,11 +104,12 @@ export function createApp(store: Store, options: AppOptions = {}): express.Expre
 
   app.get('/:slug', (req: Request, res: Response) => {
     const slug = decodeURIComponent(req.params.slug ?? '');
-    if (!store.getEpisode(slug)) {
+    const ref = store.getEpisode(slug);
+    if (!ref) {
       res.status(404).json({ error: `No episode configured with mp3Slug "${slug}"` });
       return;
     }
-    sendAudio(req, res, audio);
+    sendAudio(req, res, silenceMp3(ref.episode.durationSeconds));
   });
 
   app.get('/', (_req: Request, res: Response) => {
@@ -122,7 +119,7 @@ export function createApp(store: Store, options: AppOptions = {}): express.Expre
         '',
         'POST /config                     set the podcast configuration (JSON)',
         'GET  /{podcast-slug}.rss         synthesized RSS feed',
-        'GET  /{episode-mp3-slug}         2 minute silent MP3 (128 kbit/s stereo)',
+        'GET  /{episode-mp3-slug}         silent MP3, per-episode length (128 kbit/s stereo)',
         'GET  /health                     status',
         '',
         `Configured podcasts: ${store.podcastCount()} (episodes: ${store.episodeCount()})`,

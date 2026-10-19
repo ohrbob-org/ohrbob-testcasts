@@ -16,9 +16,13 @@ Typical uses:
 - **Feed/metadata testing** — verify RSS 2.0 and iTunes namespace handling:
   titles, descriptions, artwork, `enclosure` URLs and lengths, `guid`,
   `pubDate`, `itunes:duration`, and episode ordering.
-- **Download and streaming behaviour** — every episode is a real 2 minute
-  MP3 (~1.9 MB) served with `Content-Length`, `Accept-Ranges`, and `Range`/`HEAD`
-  support, so you can test full downloads, resume, seeking, and partial requests.
+- **Download and streaming behaviour** — every episode is a real silent MP3
+  (2 minutes / ~1.9 MB by default, or a per-episode `durationSeconds`) served
+  with `Content-Length`, `Accept-Ranges`, and `Range`/`HEAD` support, so you can
+  test full downloads, resume, seeking, and partial requests.
+- **Playlist and queue behaviour** — give episodes different `durationSeconds`
+  (or make them very short) to watch a client advance, auto-play, and finish the
+  queue quickly.
 - **Multi-feed and edge cases** — serve several podcasts at once, empty feeds,
   missing artwork, duplicate/invalid configs, and 404s, to see how a client
   reacts.
@@ -159,5 +163,7 @@ curl -sS -X POST http://localhost:5004/config \
   loader must be run again.
 - Episode `mp3Slug` values must be unique **across all podcasts**, or the post
   returns `400`.
+- Episode `durationSeconds` is optional: a positive number of seconds, at most
+  `3600` (default `120`); an out-of-range value returns `400`.
 - The loader does not wait for readiness; poll `/health` first if the server
   was just started.

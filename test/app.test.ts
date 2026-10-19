@@ -98,6 +98,35 @@ test('supports HEAD and byte-range requests on audio', async (t) => {
   assert.equal(bad.status, 416);
 });
 
+test('serves each episode at its configured length', async (t) => {
+  const { base } = startServer(t);
+  await postConfig(base, [
+    {
+      slug: 'sized',
+      name: 'Sized',
+      episodes: [
+        { title: 'Short', mp3Slug: 'short', durationSeconds: 30 },
+        { title: 'Default', mp3Slug: 'default' },
+      ],
+    },
+  ]);
+
+  const short = await fetch(`${base}/short`);
+  assert.equal(short.headers.get('content-length'), '478716');
+
+  const shortHead = await fetch(`${base}/short`, { method: 'HEAD' });
+  assert.equal(shortHead.headers.get('content-length'), '478716');
+
+  const fallback = await fetch(`${base}/default`);
+  assert.equal(fallback.headers.get('content-length'), '1915698');
+
+  const xml = await (await fetch(`${base}/sized.rss`)).text();
+  assert.match(xml, /url="http:\/\/test\.local\/short" length="478716"/);
+  assert.match(xml, /url="http:\/\/test\.local\/default" length="1915698"/);
+  assert.match(xml, /<itunes:duration>30<\/itunes:duration>/);
+  assert.match(xml, /<itunes:duration>120<\/itunes:duration>/);
+});
+
 test('a later config replaces the previous one', async (t) => {
   const { base } = startServer(t);
   await postConfig(base, CONFIG);

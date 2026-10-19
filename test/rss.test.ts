@@ -10,15 +10,13 @@ const podcast: Podcast = {
   coverUrl: 'https://example.com/show.jpg',
   description: 'A show for testing',
   episodes: [
-    { title: 'Episode One', description: 'First', coverUrl: 'https://example.com/ep1.jpg', mp3Slug: 'ep-1' },
-    { title: 'Episode Two', description: 'Second', coverUrl: '', mp3Slug: 'ep-2' },
+    { title: 'Episode One', description: 'First', coverUrl: 'https://example.com/ep1.jpg', mp3Slug: 'ep-1', durationSeconds: 120 },
+    { title: 'Episode Two', description: 'Second', coverUrl: '', mp3Slug: 'ep-2', durationSeconds: 30 },
   ],
 };
 
 const options = {
   baseUrl: 'http://localhost:3000',
-  episodeLength: 1_915_698,
-  episodeDurationSeconds: 120,
   pubDateBase: new Date('2024-01-02T12:00:00Z'),
 };
 
@@ -38,14 +36,15 @@ test('emits one item per episode with a self-hosted enclosure', () => {
 
   assert.equal((xml.match(/<item>/g) ?? []).length, 2);
   assert.match(xml, /<enclosure url="http:\/\/localhost:3000\/ep-1" length="1915698" type="audio\/mpeg" \/>/);
-  assert.match(xml, /<enclosure url="http:\/\/localhost:3000\/ep-2" length="1915698" type="audio\/mpeg" \/>/);
+  assert.match(xml, /<enclosure url="http:\/\/localhost:3000\/ep-2" length="478716" type="audio\/mpeg" \/>/);
   assert.match(xml, /<itunes:duration>120<\/itunes:duration>/);
+  assert.match(xml, /<itunes:duration>30<\/itunes:duration>/);
   assert.match(xml, /<guid isPermaLink="false">http:\/\/localhost:3000\/ep-1<\/guid>/);
 });
 
 test('falls back to the podcast cover when an episode has none', () => {
   const xml = buildRss(podcast, options);
-  assert.match(xml, /<itunes:image href="https:\/\/example\.com\/show\.jpg" \/>\s*<itunes:duration>120<\/itunes:duration>/);
+  assert.match(xml, /<itunes:image href="https:\/\/example\.com\/show\.jpg" \/>\s*<itunes:duration>30<\/itunes:duration>/);
 });
 
 test('orders episodes newest first by one day', () => {
@@ -59,7 +58,7 @@ test('escapes XML special characters', () => {
     ...podcast,
     name: 'Tom & Jerry <Show>',
     description: 'Quotes "here" and \'there\'',
-    episodes: [{ title: 'A & B', description: '<b>bold</b>', coverUrl: '', mp3Slug: 'x' }],
+    episodes: [{ title: 'A & B', description: '<b>bold</b>', coverUrl: '', mp3Slug: 'x', durationSeconds: 120 }],
   };
   const xml = buildRss(nasty, options);
 

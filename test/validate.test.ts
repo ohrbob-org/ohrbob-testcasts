@@ -53,3 +53,45 @@ test('rejects non-array input', () => {
   assert.ok(normalizeConfig({}).errors.length > 0);
   assert.ok(normalizeConfig(null).errors.length > 0);
 });
+
+test('defaults an episode duration to 120 seconds', () => {
+  const { podcasts, errors } = normalizeConfig([{ slug: 's', name: 'n', episodes: [{ title: 't', mp3Slug: 'e' }] }]);
+  assert.deepEqual(errors, []);
+  assert.equal(podcasts[0]?.episodes[0]?.durationSeconds, 120);
+});
+
+test('accepts a per-episode duration from number and string spellings', () => {
+  const { podcasts, errors } = normalizeConfig([
+    {
+      slug: 's',
+      name: 'n',
+      episodes: [
+        { title: 'a', mp3Slug: 'a', durationSeconds: 30 },
+        { title: 'b', mp3Slug: 'b', duration_seconds: 45 },
+        { title: 'c', mp3Slug: 'c', duration: 90 },
+        { title: 'd', mp3Slug: 'd', length: '15' },
+      ],
+    },
+  ]);
+
+  assert.deepEqual(errors, []);
+  assert.deepEqual(
+    podcasts[0]?.episodes.map((episode) => episode.durationSeconds),
+    [30, 45, 90, 15],
+  );
+});
+
+test('rejects an episode duration that is not a positive number of seconds', () => {
+  const bad = [0, -5, 'abc', 7200];
+  const { podcasts, errors } = normalizeConfig([
+    {
+      slug: 's',
+      name: 'n',
+      episodes: bad.map((duration, i) => ({ title: `e${i}`, mp3Slug: `e${i}`, durationSeconds: duration })),
+    },
+  ]);
+
+  assert.equal(podcasts[0]?.episodes.length, 0);
+  assert.equal(errors.length, bad.length);
+  assert.ok(errors.every((error) => error.toLowerCase().includes('duration')));
+});

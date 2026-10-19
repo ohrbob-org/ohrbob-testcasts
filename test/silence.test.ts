@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { generateSilenceMp3, SILENCE_DURATION_SECONDS, silenceMp3 } from '../src/silence.js';
+import { generateSilenceMp3, SILENCE_DURATION_SECONDS, silenceByteLength, silenceMp3 } from '../src/silence.js';
 
 const FRAME_LENGTH = 417;
 const SAMPLES_PER_FRAME = 1152;
@@ -38,4 +38,21 @@ test('rejects a non-positive duration', () => {
 
 test('caches the shared buffer', () => {
   assert.equal(silenceMp3(), silenceMp3());
+});
+
+test('reports the byte length for a duration without building the buffer', () => {
+  // 30 s -> round(30 * 44100 / 1152) = 1148 frames, 1148 * 417 = 478716 bytes.
+  assert.equal(silenceByteLength(30), 478716);
+  // Default 120 s -> 4594 frames -> 1915698 bytes.
+  assert.equal(silenceByteLength(), 1915698);
+});
+
+test('rejects a non-positive duration for byte length', () => {
+  assert.throws(() => silenceByteLength(0), RangeError);
+});
+
+test('caches one buffer per duration', () => {
+  assert.equal(silenceMp3(30).length, 478716);
+  assert.notEqual(silenceMp3(30), silenceMp3(60));
+  assert.equal(silenceMp3(30), silenceMp3(30));
 });

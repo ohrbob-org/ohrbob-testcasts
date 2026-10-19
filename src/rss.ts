@@ -1,12 +1,9 @@
+import { silenceByteLength } from './silence.js';
 import type { Podcast } from './types.js';
 
 export interface RssOptions {
   /** Absolute base URL of this service, without a trailing slash. */
   baseUrl: string;
-  /** Byte length of the served silent MP3, used for the enclosure length. */
-  episodeLength: number;
-  /** Duration of the served silent MP3 in seconds. */
-  episodeDurationSeconds: number;
   /** Newest episode's publication date; earlier episodes step back one day each. */
   pubDateBase: Date;
 }
@@ -50,6 +47,7 @@ export function buildRss(podcast: Podcast, options: RssOptions): string {
     const enclosureUrl = `${base}/${encodeURIComponent(episode.mp3Slug)}`;
     const pubDate = new Date(options.pubDateBase.getTime() - index * DAY_MS).toUTCString();
     const episodeImage = episode.coverUrl || image;
+    const enclosureLength = silenceByteLength(episode.durationSeconds);
     const lines = [
       '    <item>',
       `      <title>${escapeXml(episode.title)}</title>`,
@@ -57,9 +55,9 @@ export function buildRss(podcast: Podcast, options: RssOptions): string {
       `      <link>${escapeXml(enclosureUrl)}</link>`,
       `      <guid isPermaLink="false">${escapeXml(enclosureUrl)}</guid>`,
       `      <pubDate>${pubDate}</pubDate>`,
-      `      <enclosure url="${escapeXml(enclosureUrl)}" length="${options.episodeLength}" type="audio/mpeg" />`,
+      `      <enclosure url="${escapeXml(enclosureUrl)}" length="${enclosureLength}" type="audio/mpeg" />`,
       episodeImage ? `      <itunes:image href="${escapeXml(episodeImage)}" />` : undefined,
-      `      <itunes:duration>${options.episodeDurationSeconds}</itunes:duration>`,
+      `      <itunes:duration>${episode.durationSeconds}</itunes:duration>`,
       '      <itunes:explicit>false</itunes:explicit>',
       '    </item>',
     ].filter((line): line is string => line !== undefined);

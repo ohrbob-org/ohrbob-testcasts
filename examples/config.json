@@ -13,8 +13,9 @@
       },
       {
         "title": "Episode 2: Second Serving",
-        "description": "Another two minutes of pure silence.",
+        "description": "A deliberately short episode, to skip through quickly.",
         "coverUrl": "",
+        "durationSeconds": 30,
         "mp3Slug": "the-test-show-ep2.mp3"
       }
     ]
@@ -27,8 +28,9 @@
     "episodes": [
       {
         "title": "The Quiet One",
-        "description": "Shhh.",
+        "description": "Five quiet minutes.",
         "coverUrl": "",
+        "durationSeconds": 300,
         "mp3Slug": "silence-weekly-001.mp3"
       }
     ]
