@@ -4,19 +4,30 @@
     "name": "The Test Show",
     "coverUrl": "https://picsum.photos/seed/testshow/1400/1400",
     "description": "A synthetic podcast used to exercise podcast clients.",
+	  "pubDate": "2023-05-11T12:00:00Z",
     "episodes": [
       {
         "title": "Episode 1: Hello World",
         "description": "The very first synthetic episode.",
         "coverUrl": "https://picsum.photos/seed/ep1/1400/1400",
-        "mp3Slug": "the-test-show-ep1.mp3"
+        "mp3Slug": "the-test-show-ep3.mp3",
+        "pubDate": "2023-05-05T12:00:00Z"
       },
       {
         "title": "Episode 2: Second Serving",
         "description": "A deliberately short episode, to skip through quickly.",
         "coverUrl": "",
         "durationSeconds": 30,
-        "mp3Slug": "the-test-show-ep2.mp3"
+        "mp3Slug": "the-test-show-ep4.mp3",
+        "pubDate": "2023-05-10T12:00:00Z"
+      },
+      {
+        "title": "Episode 3: Third Serving",
+        "description": "A third episode.",
+        "coverUrl": "",
+        "durationSeconds": 30,
+        "mp3Slug": "the-test-show-ep5.mp3",
+        "pubDate": "2023-09-10T12:00:00Z"
       }
     ]
   },
@@ -31,7 +42,8 @@
         "description": "Five quiet minutes.",
         "coverUrl": "",
         "durationSeconds": 300,
-        "mp3Slug": "silence-weekly-001.mp3"
+        "mp3Slug": "silence-weekly-001.mp3",
+        "pubDate": "2025-01-10T12:00:00Z"
       }
     ]
   }

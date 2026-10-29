@@ -127,6 +127,25 @@ test('serves each episode at its configured length', async (t) => {
   assert.match(xml, /<itunes:duration>120<\/itunes:duration>/);
 });
 
+test('honours a configured pubDate', async (t) => {
+  const { base } = startServer(t);
+  await postConfig(base, [
+    {
+      slug: 'dated',
+      name: 'Dated Show',
+      pubDate: '2023-05-10T12:00:00Z',
+      episodes: [
+        { title: 'New', mp3Slug: 'new' },
+        { title: 'Old', mp3Slug: 'old' },
+      ],
+    },
+  ]);
+
+  const xml = await (await fetch(`${base}/dated.rss`)).text();
+  assert.match(xml, /<pubDate>Wed, 10 May 2023 12:00:00 GMT<\/pubDate>/);
+  assert.match(xml, /<pubDate>Tue, 09 May 2023 12:00:00 GMT<\/pubDate>/);
+});
+
 test('a later config replaces the previous one', async (t) => {
   const { base } = startServer(t);
   await postConfig(base, CONFIG);

@@ -76,7 +76,7 @@ export function createApp(store: Store, options: AppOptions = {}): express.Expre
       res.status(400).json({ error: 'Invalid configuration', details: errors });
       return;
     }
-
+    console.log(`Loaded ${podcasts.length} podcasts with ${podcasts.reduce((count, p) => count + p.episodes.length, 0)} episodes`);
     store.setConfig(podcasts);
     res.json({
       ok: true,
@@ -95,7 +95,7 @@ export function createApp(store: Store, options: AppOptions = {}): express.Expre
 
     const xml = buildRss(podcast, {
       baseUrl: resolveBaseUrl(req),
-      pubDateBase: store.updatedAt(),
+      pubDateBase: podcast.pubDate ? new Date(podcast.pubDate) : store.updatedAt(),
     });
 
     res.setHeader('Content-Type', 'application/rss+xml; charset=utf-8');

@@ -53,6 +53,7 @@ const COVER_KEYS = ['coverUrl', 'cover_url', 'cover', 'imageUrl', 'image_url', '
 const EPISODE_SLUG_KEYS = ['mp3Slug', 'mp3_slug', 'audioSlug', 'audio_slug', 'episodeMp3Slug', 'episode_mp3_slug', 'mp3', 'audio', 'file'];
 const EPISODE_KEYS = ['episodes', 'items', 'episode'];
 const DURATION_KEYS = ['durationSeconds', 'duration_seconds', 'lengthSeconds', 'length_seconds', 'duration', 'length'];
+const PUBDATE_KEYS = ['pubDate', 'pub_date', 'publishDate', 'publish_date', 'date'];
 
 function normalizeEpisode(value: unknown, path: string, errors: string[]): Episode | undefined {
   if (!isDict(value)) {
@@ -83,7 +84,20 @@ function normalizeEpisode(value: unknown, path: string, errors: string[]): Episo
     }
   }
 
-  if (!title || !mp3Slug || !durationValid) {
+  const rawPubDate = asString(pick(value, PUBDATE_KEYS));
+  let pubDate: string | undefined;
+  let pubDateValid = true;
+  if (rawPubDate !== undefined) {
+    const parsed = new Date(rawPubDate);
+    if (isNaN(parsed.getTime())) {
+      errors.push(`${path}.pubDate must be a valid ISO 8601 date string`);
+      pubDateValid = false;
+    } else {
+      pubDate = parsed.toISOString();
+    }
+  }
+
+  if (!title || !mp3Slug || !durationValid || !pubDateValid) {
     return undefined;
   }
 
@@ -93,6 +107,7 @@ function normalizeEpisode(value: unknown, path: string, errors: string[]): Episo
     durationSeconds,
     description: asString(pick(value, DESCRIPTION_KEYS)) ?? '',
     coverUrl: asString(pick(value, COVER_KEYS)) ?? '',
+    ...(pubDate !== undefined && { pubDate }),
   };
 }
 
@@ -128,7 +143,20 @@ function normalizePodcast(value: unknown, index: number, errors: string[]): Podc
     errors.push(`${path}.episodes must be an array`);
   }
 
-  if (!slug || !name) {
+  const rawPubDate = asString(pick(value, PUBDATE_KEYS));
+  let pubDate: string | undefined;
+  let pubDateValid = true;
+  if (rawPubDate !== undefined) {
+    const parsed = new Date(rawPubDate);
+    if (isNaN(parsed.getTime())) {
+      errors.push(`${path}.pubDate must be a valid ISO 8601 date string`);
+      pubDateValid = false;
+    } else {
+      pubDate = parsed.toISOString();
+    }
+  }
+
+  if (!slug || !name || !pubDateValid) {
     return undefined;
   }
 
@@ -138,6 +166,7 @@ function normalizePodcast(value: unknown, index: number, errors: string[]): Podc
     episodes,
     description: asString(pick(value, DESCRIPTION_KEYS)) ?? '',
     coverUrl: asString(pick(value, COVER_KEYS)) ?? '',
+    ...(pubDate !== undefined && { pubDate }),
   };
 }
 

@@ -45,7 +45,9 @@ export function buildRss(podcast: Podcast, options: RssOptions): string {
 
   const items = podcast.episodes.map((episode, index) => {
     const enclosureUrl = `${base}/${encodeURIComponent(episode.mp3Slug)}`;
-    const pubDate = new Date(options.pubDateBase.getTime() - index * DAY_MS).toUTCString();
+    const pubDate = episode.pubDate
+      ? new Date(episode.pubDate).toUTCString()
+      : new Date(options.pubDateBase.getTime() - index * DAY_MS).toUTCString();
     const episodeImage = episode.coverUrl || image;
     const enclosureLength = silenceByteLength(episode.durationSeconds);
     const lines = [

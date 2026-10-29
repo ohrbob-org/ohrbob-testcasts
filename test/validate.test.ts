@@ -10,8 +10,24 @@ test('accepts a bare array and fills optional fields', () => {
   assert.equal(podcasts.length, 1);
   assert.equal(podcasts[0]?.description, '');
   assert.equal(podcasts[0]?.coverUrl, '');
+  assert.equal(podcasts[0]?.pubDate, undefined);
   assert.equal(podcasts[0]?.episodes[0]?.description, '');
   assert.equal(podcasts[0]?.episodes[0]?.coverUrl, '');
+});
+
+test('accepts a pubDate', () => {
+  const { podcasts, errors } = normalizeConfig([{ slug: 's', name: 'n', pubDate: '2023-01-01T00:00:00Z', episodes: [] }]);
+
+  assert.deepEqual(errors, []);
+  assert.equal(podcasts[0]?.pubDate, '2023-01-01T00:00:00.000Z');
+});
+
+test('rejects an invalid pubDate', () => {
+  const { podcasts, errors } = normalizeConfig([{ slug: 's', name: 'n', pubDate: 'invalid-date', episodes: [] }]);
+
+  assert.equal(podcasts.length, 0);
+  assert.equal(errors.length, 1);
+  assert.ok(errors[0]?.includes('pubDate'));
 });
 
 test('accepts an object wrapper and snake_case keys', () => {

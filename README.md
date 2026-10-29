@@ -98,6 +98,7 @@ Fields:
 | -------------- | -------- | ------------------------------------------------------------ |
 | `slug`         | yes      | Unique. The feed is served at `/{slug}.rss`.                 |
 | `name`         | yes      | Podcast title.                                               |
+| `pubDate`      | no       | Base publication date (ISO 8601). Older episodes step back daily. Defaults to config load time. |
 | `coverUrl`     | no       | Podcast artwork URL.                                         |
 | `description`  | no       | Podcast summary.                                             |
 | `episodes`     | no       | Array; defaults to empty.                                    |
@@ -122,8 +123,8 @@ A successful post returns:
 
 - Enclosure URLs point back at this server (`{base}/{mp3Slug}`), so the feed is
   self-contained; cover images are linked exactly as configured.
-- The newest episode is dated at config time; each following episode steps back
-  one day.
+- The newest episode is dated at the podcast's `pubDate` (or config time);
+  each following episode steps back one day.
 - Each episode's enclosure `length` matches its served MP3 byte length, and
   `itunes:duration` reports its configured length in seconds.
 

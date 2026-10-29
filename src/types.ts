@@ -9,6 +9,8 @@ export interface Episode {
   mp3Slug: string;
   /** Length of the served silent MP3 in seconds. Defaults to 120. */
   durationSeconds: number;
+  /** Optional base publishing date for this episode. */
+  pubDate?: string;
 }
 
 export interface Podcast {
@@ -20,5 +22,7 @@ export interface Podcast {
   coverUrl: string;
   /** Podcast description / summary. */
   description: string;
+  /** Optional base publishing date for episodes. If missing, defaults to the time the config was loaded. */
+  pubDate?: string;
   episodes: Episode[];
 }
